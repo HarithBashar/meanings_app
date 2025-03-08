@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:meaning/ui/score_page.dart';
 import 'package:vibration/vibration.dart';
 
 import '../resources/classes/app_data.dart';
@@ -102,6 +103,10 @@ class _QuizPageState extends State<QuizPage> {
                             bool isCorrect = selectedAnswer == controller.quiz[currentQuestion].answer;
                             playFeedback(isCorrect);
                             await Future.delayed(Duration(milliseconds: 1200));
+                            if (currentQuestion + 1 == controller.quiz.length) {
+                              Get.to(() => ScorePage(score: score, totalQuestions: controller.quiz.length));
+                              return;
+                            }
                             currentQuestion = (currentQuestion + 1) % controller.quiz.length;
                             setState(() => isPressed = false);
                           },
