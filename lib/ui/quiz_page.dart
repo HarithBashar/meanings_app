@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,6 +19,8 @@ class _QuizPageState extends State<QuizPage> {
 
   bool isPressed = false;
   String selectedAnswer = '';
+
+  AudioPlayer player = AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +83,9 @@ class _QuizPageState extends State<QuizPage> {
                               color: isPressed
                                   ? controller.quiz[currentQuestion].options[i] == controller.quiz[currentQuestion].answer
                                       ? Colors.green[200]
-                                      : Colors.red[200]
+                                      : selectedAnswer == controller.quiz[currentQuestion].options[i]
+                                          ? Colors.red[200]
+                                          : Colors.white
                                   : Colors.white,
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
@@ -93,7 +98,13 @@ class _QuizPageState extends State<QuizPage> {
                             selectedAnswer = controller.quiz[currentQuestion].options[i];
                             if (controller.quiz[currentQuestion].options[i] == controller.quiz[currentQuestion].answer) score++;
                             setState(() => isPressed = true);
-                            await Future.delayed(Duration(seconds: 2));
+                            try {
+                              String path = selectedAnswer == controller.quiz[currentQuestion].answer ? 'sounds/correct1.wav' : 'sounds/wrong1.wav';
+                              await player.play(AssetSource(path));
+                            } catch (e, f) {
+                              print("$e\n$f");
+                            }
+                            await Future.delayed(Duration(milliseconds: 1200));
                             currentQuestion = (currentQuestion + 1) % controller.quiz.length;
                             setState(() => isPressed = false);
                           },
