@@ -33,6 +33,30 @@ class AppData extends GetxController {
     saveWord();
   }
 
+  // =================== Settings ===================
+
+  bool useVibration = true;
+  bool useSound = true;
+  bool useColoredTodayWords = true;
+
+  void toggleVibration() {
+    useVibration = !useVibration;
+    getStorage.write('useVibration', useVibration);
+    update();
+  }
+
+  void toggleSound() {
+    useSound = !useSound;
+    getStorage.write('useSound', useSound);
+    update();
+  }
+
+  void toggleColoredTodayWords() {
+    useColoredTodayWords = !useColoredTodayWords;
+    getStorage.write('useColoredTodayWords', useColoredTodayWords);
+    update();
+  }
+
   // =================== initialize quiz ===================
 
   void getQuizReady() async {
@@ -63,7 +87,11 @@ class AppData extends GetxController {
         allWords.add(await wordsBox.get('allWords', defaultValue: [])[i]);
       }
       allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
-      print(allWords.length);
+
+      // load settings data
+      useVibration = getStorage.read('useVibration') ?? true;
+      useSound = getStorage.read('useSound') ?? true;
+      useColoredTodayWords = getStorage.read('useColoredTodayWords') ?? true;
     } catch (e, f) {
       if (kDebugMode) print("$e \n\n $f");
     }

@@ -21,6 +21,7 @@ class _QuizPageState extends State<QuizPage> {
 
   bool isPressed = false;
   String selectedAnswer = '';
+  bool isCorrect = false;
 
   AudioPlayer player = AudioPlayer();
 
@@ -49,11 +50,16 @@ class _QuizPageState extends State<QuizPage> {
                   alignment: Alignment.center,
                   child: Text("Question: ${currentQuestion + 1}"),
                 ),
-                Container(
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
                   width: size.width * .4,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Colors.deepPurple[400],
+                    color: isPressed
+                        ? isCorrect
+                            ? Colors.green[300]
+                            : Colors.red[300]
+                        : Colors.deepPurple[400],
                   ),
                   padding: EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
@@ -69,8 +75,9 @@ class _QuizPageState extends State<QuizPage> {
               return Column(
                 children: [
                   Text(
-                    controller.quiz[currentQuestion].word,
+                    controller.quiz[currentQuestion].word.capitalizeFirst!,
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
                   Wrap(
@@ -78,7 +85,8 @@ class _QuizPageState extends State<QuizPage> {
                       for (int i = 0; i < 4; i++)
                         CupertinoButton(
                           padding: EdgeInsets.zero,
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.grey[400]!),
@@ -93,14 +101,14 @@ class _QuizPageState extends State<QuizPage> {
                             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
                             margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                             alignment: Alignment.center,
-                            child: Text(controller.quiz[currentQuestion].options[i]),
+                            child: Text(controller.quiz[currentQuestion].options[i].capitalizeFirst!),
                           ),
                           onPressed: () async {
                             if (isPressed) return;
                             selectedAnswer = controller.quiz[currentQuestion].options[i];
                             if (controller.quiz[currentQuestion].options[i] == controller.quiz[currentQuestion].answer) score++;
+                            isCorrect = selectedAnswer == controller.quiz[currentQuestion].answer;
                             setState(() => isPressed = true);
-                            bool isCorrect = selectedAnswer == controller.quiz[currentQuestion].answer;
                             playFeedback(isCorrect);
                             await Future.delayed(Duration(milliseconds: 1200));
                             if (currentQuestion + 1 == controller.quiz.length) {
@@ -125,16 +133,15 @@ class _QuizPageState extends State<QuizPage> {
   void playFeedback(bool isCorrect) async {
     try {
       // play sound based on the answer
-      String path = isCorrect ? 'sounds/correct1.wav' : 'sounds/wrong1.wav';
-      await player.play(AssetSource(path));
-      // vibration based on the answer
-      // Vibrate on incorrect answers
-      if (await Vibration.hasVibrator()) {
+      if (controller.useSound) {
+        String path = isCorrect ? 'sounds/correct1.wav' : 'sounds/wrong1.wav';
+        await player.play(AssetSource(path));
+      }
+
+      if (controller.useVibration && await Vibration.hasVibrator()) {
         if (isCorrect) {
-          // Light vibration for correct answer
           Vibration.vibrate(duration: 100, amplitude: 100);
         } else {
-          // Stronger vibration for incorrect answer
           Vibration.vibrate(duration: 250, amplitude: 1000);
         }
       }

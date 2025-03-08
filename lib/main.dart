@@ -44,6 +44,12 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          toolbarHeight: 40,
+          backgroundColor: Colors.transparent,
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const HomePage(),

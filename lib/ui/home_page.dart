@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meaning/resources/classes/app_data.dart';
 import 'package:meaning/ui/quiz_page.dart';
+import 'package:meaning/ui/settings.dart';
 
 import '../resources/classes/word_class.dart';
 import '../resources/constants.dart';
@@ -82,10 +83,14 @@ class _HomePageState extends State<HomePage> {
         title: Text("Words"),
         automaticallyImplyLeading: true,
         forceMaterialTransparency: true,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        toolbarHeight: 40,
-        backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings_rounded),
+            onPressed: () {
+              Get.to(() => const Settings());
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -99,11 +104,15 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               alignment: Alignment.center,
               child: Text(
-                "Start Quiz",
+                "Check Your Knowledge",
                 style: TextStyle(color: Colors.white),
               ),
             ),
             onPressed: () {
+              if (controller.allWords.length < 4) {
+                Get.snackbar("Error", "You need at least 4 words to start the quiz");
+                return;
+              }
               controller.getQuizReady();
               Get.to(() => const QuizPage());
             },
@@ -116,19 +125,21 @@ class _HomePageState extends State<HomePage> {
                   padding: EdgeInsets.zero,
                   itemCount: controller.allWords.length,
                   itemBuilder: (context, index) {
+                    Word word = controller.allWords[index];
                     return ListTile(
+                      tileColor: isSameDay(DateTime.now(), word.timeAdded) && controller.useColoredTodayWords ? Colors.deepPurple[50] : null,
                       title: Row(
                         children: [
                           Expanded(
                             child: Text(
-                              controller.allWords[index].word,
+                              word.word,
                               style: TextStyle(fontSize: 20),
                               textAlign: TextAlign.left,
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              controller.allWords[index].meaning,
+                              word.meaning,
                               style: TextStyle(fontSize: 20),
                               textAlign: TextAlign.right,
                             ),
@@ -136,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       onLongPress: () {
-                        controller.deleteWord(controller.allWords[index].id);
+                        controller.deleteWord(word.id);
                       },
                     );
                   },
