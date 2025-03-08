@@ -112,23 +112,36 @@ class _HomePageState extends State<HomePage> {
             child: GetBuilder(
               init: AppData(),
               builder: (controller) {
-                return ListView.builder(
+                return ListView.separated(
                   padding: EdgeInsets.zero,
                   itemCount: controller.allWords.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(
-                        controller.allWords[index].word,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      trailing: Text(
-                        controller.allWords[index].meaning,
-                        style: TextStyle(fontSize: 15),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              controller.allWords[index].word,
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              controller.allWords[index].meaning,
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
                       ),
                       onLongPress: () {
                         controller.deleteWord(controller.allWords[index].id);
                       },
                     );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider(height: 5, color: Colors.grey[200]);
                   },
                 );
               },

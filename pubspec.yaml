@@ -17,6 +17,8 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   build_runner: ^2.4.15
+  rename: ^3.0.2
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
