@@ -50,6 +50,7 @@ class _MyAppState extends State<MyApp> {
           toolbarHeight: 40,
           backgroundColor: Colors.transparent,
         ),
+        fontFamily: mainFont,
       ),
       debugShowCheckedModeBanner: false,
       home: const HomePage(),

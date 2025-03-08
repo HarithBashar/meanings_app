@@ -2,10 +2,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:meaning/ui/score_page.dart';
+import 'package:meaning/ui/quiz/score_page.dart';
 import 'package:vibration/vibration.dart';
 
-import '../resources/classes/app_data.dart';
+import '../../resources/classes/app_data.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({super.key});
@@ -157,7 +157,7 @@ class _QuizPageState extends State<QuizPage> {
         }
       }
     } catch (e, f) {
-      print("$e\n$f");
+      debugPrint("$e\n$f");
     }
   }
 }

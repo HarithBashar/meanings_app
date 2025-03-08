@@ -59,27 +59,27 @@ class AppData extends GetxController {
 
   // =================== initialize quiz ===================
 
-  void getQuizReady() async {
+  void getQuizReady(bool isWordExam) async {
     quiz.clear();
     allWords.shuffle();
     for (Word word in allWords) {
       quiz.add(Question(
-        word: word.word,
-        options: initialOptions(word),
-        answer: word.meaning,
+        word: isWordExam ? word.word : word.meaning,
+        options: initialOptions(word, isWordExam),
+        answer: isWordExam ? word.meaning : word.word,
       ));
     }
     allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
   }
 
-  List<String> initialOptions(Word word) {
-    List<String> options = [for (int i = 0; i < 3; i++) allWords[Random().nextInt(allWords.length)].meaning, word.meaning];
+  List<String> initialOptions(Word word, bool isWordExam) {
+    List<String> options = [for (int i = 0; i < 3; i++) isWordExam ? allWords[Random().nextInt(allWords.length)].meaning : allWords[Random().nextInt(allWords.length)].word, isWordExam ? word.meaning : word.word];
     options = options.toSet().toList();
     while (options.length < 4) {
-      options = [for (int i = 0; i < 3; i++) allWords[Random().nextInt(allWords.length)].meaning, word.meaning];
+      options = [for (int i = 0; i < 3; i++) isWordExam ? allWords[Random().nextInt(allWords.length)].meaning : allWords[Random().nextInt(allWords.length)].word, isWordExam ? word.meaning : word.word];
       options = options.toSet().toList();
     }
-    if (!options.contains(word.meaning)) options[Random().nextInt(4)] = word.meaning;
+    if (!options.contains(isWordExam ? word.meaning : word.word)) options[Random().nextInt(4)] = isWordExam ? word.meaning : word.word;
     options.shuffle();
     return options;
   }
@@ -97,6 +97,7 @@ class AppData extends GetxController {
         allWords.add(await wordsBox.get('allWords', defaultValue: [])[i]);
       }
       allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
+      update();
 
       // load settings data
       useVibration = getStorage.read('useVibration') ?? true;

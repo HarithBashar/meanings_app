@@ -1,6 +1,8 @@
 import 'package:get_storage/get_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+String mainFont = 'Rubik';
+
 late Box wordsBox;
 
 GetStorage getStorage = GetStorage();

@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:meaning/ui/home_page.dart';
 import 'package:vibration/vibration.dart';
 
-import '../resources/classes/app_data.dart';
+import '../../resources/classes/app_data.dart';
 
 class ScorePage extends StatefulWidget {
   const ScorePage({
@@ -187,7 +187,7 @@ class _ScorePageState extends State<ScorePage> {
         }
       }
     } catch (e, f) {
-      print("$e\n$f");
+      debugPrint("$e\n$f");
     }
   }
 }

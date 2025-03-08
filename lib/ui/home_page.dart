@@ -1,10 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meaning/resources/classes/app_data.dart';
-import 'package:meaning/ui/quiz_page.dart';
+import 'package:meaning/ui/components/my_button.dart';
+import 'package:meaning/ui/quiz/quiz_page.dart';
+import 'package:meaning/ui/quiz/quiz_setup_page.dart';
 import 'package:meaning/ui/settings.dart';
 
 import '../resources/classes/word_class.dart';
@@ -22,133 +23,161 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      // extendBodyBehindAppBar: true,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          TextEditingController wordController = TextEditingController();
-          TextEditingController meaningController = TextEditingController();
-
-          bool isAdded = false;
-          await Get.defaultDialog(
-            title: "Add Word",
-            content: Column(
-              children: [
-                TextField(
-                  controller: wordController,
-                  decoration: InputDecoration(
-                    labelText: "Word",
-                  ),
-                  autofocus: true,
-                ),
-                TextField(
-                  controller: meaningController,
-                  decoration: InputDecoration(
-                    labelText: "Meaning",
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                  isAdded = true;
-                },
-                child: Text("Add"),
-              ),
-            ],
-          );
-          if (isAdded) {
-            Word word = Word(
-              word: wordController.text.trim(),
-              meaning: meaningController.text.trim(),
-              timeAdded: DateTime.now(),
-              language: "Turkish",
-              id: getRandomID(),
-            );
-            controller.addWord(word);
-          }
-        },
-        child: Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        title: Text("Words"),
-        automaticallyImplyLeading: true,
-        forceMaterialTransparency: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings_rounded),
-            onPressed: () {
-              Get.to(() => const Settings());
-            },
-          ),
-        ],
-      ),
       body: Column(
         children: [
           SafeArea(bottom: false, child: SizedBox()),
-          CupertinoButton(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.deepPurple,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              alignment: Alignment.center,
-              child: Text(
-                "Check Your Knowledge",
-                style: TextStyle(color: Colors.white),
-              ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: size.width / 50),
+            child: Column(
+              children: [
+                // app title
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Expanded(
+                          child: FittedBox(
+                            alignment: Alignment.topLeft,
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              "Word\nDictionary",
+                              style: TextStyle(
+                                fontSize: 50,
+                                fontWeight: FontWeight.w700,
+                                height: 0.9,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 60),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Get.to(() => const Settings());
+                      },
+                      icon: Icon(Icons.settings_rounded),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 25),
+                // add new word
+                Row(
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        backgroundColor: Colors.deepPurple[400],
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                        onPressed: () => addNewWord(),
+                        child: Text(
+                          "Add New Word",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                    MyButton(
+                      backgroundColor: Colors.deepPurple[900],
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+                      margin: EdgeInsets.only(left: 10),
+                      borderRadius: BorderRadius.circular(10),
+                      onPressed: () => addNewWord(),
+                      child: Icon(Icons.add, color: Colors.white),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                // search word and start quiz
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: MyButton(
+                        backgroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey[300]!),
+                        onPressed: () {},
+                        child: Row(
+                          children: [
+                            Icon(Icons.search_rounded),
+                            const SizedBox(width: 25),
+                            Text(
+                              "Search",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      flex: 2,
+                      child: MyButton(
+                        backgroundColor: Colors.pinkAccent,
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                        borderRadius: BorderRadius.circular(10),
+                        onPressed: () {
+                          if (controller.allWords.length < 4) {
+                            Get.snackbar("Error", "You need at least 4 words to start the quiz", backgroundColor: Colors.red.shade300, colorText: Colors.white);
+                            return;
+                          }
+                          Get.to(() => const QuizSetupPage());
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.quiz_rounded, color: Colors.white),
+                            const SizedBox(width: 15),
+                            Text(
+                              "Quiz",
+                              style: TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
-            onPressed: () {
-              if (controller.allWords.length < 4) {
-                Get.snackbar("Error", "You need at least 4 words to start the quiz");
-                return;
-              }
-              controller.getQuizReady();
-              Get.to(() => const QuizPage());
-            },
           ),
+          const SizedBox(height: 20),
           Expanded(
             child: GetBuilder(
               init: AppData(),
               builder: (controller) {
                 return ListView.separated(
-                  padding: EdgeInsets.zero,
+                  padding: EdgeInsets.symmetric(horizontal: size.width / 50),
                   itemCount: controller.allWords.length,
                   itemBuilder: (context, index) {
                     Word word = controller.allWords[index];
-                    return ListTile(
-                      tileColor: isSameDay(DateTime.now(), word.timeAdded) && controller.useColoredTodayWords ? Colors.deepPurple[50] : null,
-                      title: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              word.word,
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.left,
+                    return GestureDetector(
+                      onLongPress: () => controller.deleteWord(word.id),
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {},
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: textCard(word.word, word.timeAdded),
                             ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              word.meaning,
-                              style: TextStyle(fontSize: 20),
-                              textAlign: TextAlign.right,
+                            Icon(Icons.arrow_right_alt_sharp),
+                            Expanded(
+                              child: textCard(word.meaning, word.timeAdded),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      onLongPress: () {
-                        controller.deleteWord(word.id);
-                      },
                     );
                   },
                   separatorBuilder: (BuildContext context, int index) {
@@ -161,5 +190,88 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  Widget textCard(String title, DateTime timeAdded) {
+    return Stack(
+      alignment: Alignment.topRight,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            border: Border.all(color: controller.useColoredTodayWords && isSameDay(DateTime.now(), timeAdded) ? Colors.deepPurple : Colors.grey[300]!),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          margin: EdgeInsets.symmetric(vertical: 5),
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            style: TextStyle(fontSize: 16, color: Colors.black),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (controller.useColoredTodayWords && isSameDay(DateTime.now(), timeAdded))
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'New',
+              style: TextStyle(fontSize: 8, color: Colors.deepPurple),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void addNewWord() async {
+    TextEditingController wordController = TextEditingController();
+    TextEditingController meaningController = TextEditingController();
+
+    bool isAdded = false;
+    await Get.defaultDialog(
+      title: "Add Word",
+      content: Column(
+        children: [
+          TextField(
+            controller: wordController,
+            decoration: InputDecoration(
+              labelText: "Word",
+            ),
+            autofocus: true,
+          ),
+          TextField(
+            controller: meaningController,
+            decoration: InputDecoration(
+              labelText: "Meaning",
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
+            Get.back();
+            isAdded = true;
+          },
+          child: Text("Add"),
+        ),
+      ],
+    );
+    if (isAdded) {
+      Word word = Word(
+        word: wordController.text.trim(),
+        meaning: meaningController.text.trim(),
+        timeAdded: DateTime.now(),
+        language: "Turkish",
+        id: getRandomID(),
+      );
+      controller.addWord(word);
+    }
   }
 }
