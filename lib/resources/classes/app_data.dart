@@ -63,15 +63,25 @@ class AppData extends GetxController {
     quiz.clear();
     allWords.shuffle();
     for (Word word in allWords) {
-      List<String> options = [for (int i = 0; i < 3; i++) allWords[Random().nextInt(allWords.length)].meaning, word.meaning];
-      options.shuffle();
       quiz.add(Question(
         word: word.word,
-        options: options,
+        options: initialOptions(word),
         answer: word.meaning,
       ));
     }
     allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
+  }
+
+  List<String> initialOptions(Word word) {
+    List<String> options = [for (int i = 0; i < 3; i++) allWords[Random().nextInt(allWords.length)].meaning, word.meaning];
+    options = options.toSet().toList();
+    while (options.length < 4) {
+      options = [for (int i = 0; i < 3; i++) allWords[Random().nextInt(allWords.length)].meaning, word.meaning];
+      options = options.toSet().toList();
+    }
+    if (!options.contains(word.meaning)) options[Random().nextInt(4)] = word.meaning;
+    options.shuffle();
+    return options;
   }
 
   // =================== Saving and loading data ===================
