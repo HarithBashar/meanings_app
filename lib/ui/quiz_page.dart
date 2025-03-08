@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:vibration/vibration.dart';
 
 import '../resources/classes/app_data.dart';
 
@@ -98,12 +99,8 @@ class _QuizPageState extends State<QuizPage> {
                             selectedAnswer = controller.quiz[currentQuestion].options[i];
                             if (controller.quiz[currentQuestion].options[i] == controller.quiz[currentQuestion].answer) score++;
                             setState(() => isPressed = true);
-                            try {
-                              String path = selectedAnswer == controller.quiz[currentQuestion].answer ? 'sounds/correct1.wav' : 'sounds/wrong1.wav';
-                              await player.play(AssetSource(path));
-                            } catch (e, f) {
-                              print("$e\n$f");
-                            }
+                            bool isCorrect = selectedAnswer == controller.quiz[currentQuestion].answer;
+                            playFeedback(isCorrect);
                             await Future.delayed(Duration(milliseconds: 1200));
                             currentQuestion = (currentQuestion + 1) % controller.quiz.length;
                             setState(() => isPressed = false);
@@ -118,5 +115,26 @@ class _QuizPageState extends State<QuizPage> {
         ],
       ),
     );
+  }
+
+  void playFeedback(bool isCorrect) async {
+    try {
+      // play sound based on the answer
+      String path = isCorrect ? 'sounds/correct1.wav' : 'sounds/wrong1.wav';
+      await player.play(AssetSource(path));
+      // vibration based on the answer
+      // Vibrate on incorrect answers
+      if (await Vibration.hasVibrator()) {
+        if (isCorrect) {
+          // Light vibration for correct answer
+          Vibration.vibrate(duration: 100, amplitude: 100);
+        } else {
+          // Stronger vibration for incorrect answer
+          Vibration.vibrate(duration: 250, amplitude: 1000);
+        }
+      }
+    } catch (e, f) {
+      print("$e\n$f");
+    }
   }
 }
