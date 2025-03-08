@@ -48,7 +48,18 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 10),
                   alignment: Alignment.center,
-                  child: Text("Question: ${currentQuestion + 1}"),
+                  child: Text.rich(
+                    TextSpan(
+                      text: "Question: ",
+                      children: [
+                        TextSpan(
+                          text: "${currentQuestion + 1}",
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        TextSpan(text: "/${controller.quiz.length}"),
+                      ],
+                    ),
+                  ),
                 ),
                 AnimatedContainer(
                   duration: Duration(milliseconds: 300),
@@ -89,7 +100,7 @@ class _QuizPageState extends State<QuizPage> {
                             duration: Duration(milliseconds: 300),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.grey[400]!),
+                              border: Border.all(color: Colors.grey[200]!),
                               color: isPressed
                                   ? controller.quiz[currentQuestion].options[i] == controller.quiz[currentQuestion].answer
                                       ? Colors.green[200]
