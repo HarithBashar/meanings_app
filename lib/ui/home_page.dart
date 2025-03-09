@@ -91,9 +91,14 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Icon(Icons.add, color: Colors.white),
                           const SizedBox(width: 5),
-                          Text(
-                            controller.allWords.length.toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          GetBuilder(
+                            init: AppData(),
+                            builder: (controller) {
+                              return Text(
+                                controller.allWords.length.toString(),
+                                style: TextStyle(color: Colors.white, fontSize: 16),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -276,6 +281,10 @@ class _HomePageState extends State<HomePage> {
       ],
     );
     if (isAdded) {
+      if (wordController.text.trim().isEmpty || meaningController.text.trim().isEmpty) {
+        Get.snackbar("Error", "Please fill all the fields", backgroundColor: Colors.red.shade300, colorText: Colors.white);
+        return;
+      }
       Word word = Word(
         word: wordController.text.trim(),
         meaning: meaningController.text.trim(),
