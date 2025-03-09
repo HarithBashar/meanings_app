@@ -59,17 +59,17 @@ class AppData extends GetxController {
 
   // =================== initialize quiz ===================
 
-  void getQuizReady(bool isWordExam) async {
+  void getQuizReady(bool isWordExam, List<Word> examWords) async {
     quiz.clear();
-    allWords.shuffle();
-    for (Word word in allWords) {
+    for (Word word in examWords) {
       quiz.add(Question(
         word: isWordExam ? word.word : word.meaning,
         options: initialOptions(word, isWordExam),
         answer: isWordExam ? word.meaning : word.word,
       ));
     }
-    allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
+    quiz.shuffle();
+    quiz.shuffle();
   }
 
   List<String> initialOptions(Word word, bool isWordExam) {

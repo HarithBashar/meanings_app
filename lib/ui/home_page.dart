@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meaning/resources/classes/app_data.dart';
 import 'package:meaning/ui/components/my_button.dart';
-import 'package:meaning/ui/quiz/quiz_page.dart';
 import 'package:meaning/ui/quiz/quiz_setup_page.dart';
 import 'package:meaning/ui/settings.dart';
 
@@ -89,7 +87,16 @@ class _HomePageState extends State<HomePage> {
                       margin: EdgeInsets.only(left: 10),
                       borderRadius: BorderRadius.circular(10),
                       onPressed: () => addNewWord(),
-                      child: Icon(Icons.add, color: Colors.white),
+                      child: Row(
+                        children: [
+                          Icon(Icons.add, color: Colors.white),
+                          const SizedBox(width: 5),
+                          Text(
+                            controller.allWords.length.toString(),
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -156,32 +163,34 @@ class _HomePageState extends State<HomePage> {
             child: GetBuilder(
               init: AppData(),
               builder: (controller) {
-                return ListView.separated(
+                return ListView.builder(
                   padding: EdgeInsets.symmetric(horizontal: size.width / 50),
                   itemCount: controller.allWords.length,
                   itemBuilder: (context, index) {
                     Word word = controller.allWords[index];
-                    return GestureDetector(
-                      onLongPress: () => controller.deleteWord(word.id),
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () {},
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: textCard(word.word, word.timeAdded),
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onLongPress: () => controller.deleteWord(word.id),
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {},
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: textCard(word.word, word.timeAdded),
+                                ),
+                                Icon(Icons.arrow_right_alt_sharp),
+                                Expanded(
+                                  child: textCard(word.meaning, word.timeAdded),
+                                ),
+                              ],
                             ),
-                            Icon(Icons.arrow_right_alt_sharp),
-                            Expanded(
-                              child: textCard(word.meaning, word.timeAdded),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        if (index == controller.allWords.length - 1) SafeArea(child: const SizedBox(height: 0)),
+                      ],
                     );
-                  },
-                  separatorBuilder: (BuildContext context, int index) {
-                    return Divider(height: 5, color: Colors.grey[200]);
                   },
                 );
               },
@@ -207,7 +216,7 @@ class _HomePageState extends State<HomePage> {
           alignment: Alignment.center,
           child: Text(
             title,
-            style: TextStyle(fontSize: 16, color: Colors.black),
+            style: TextStyle(fontSize: 16, color: Colors.black, fontFamily: mainFont),
             textAlign: TextAlign.center,
           ),
         ),
@@ -216,7 +225,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               'New',
-              style: TextStyle(fontSize: 8, color: Colors.deepPurple),
+              style: TextStyle(fontSize: 8, color: Colors.deepPurple, fontFamily: mainFont),
             ),
           ),
       ],
@@ -230,22 +239,25 @@ class _HomePageState extends State<HomePage> {
     bool isAdded = false;
     await Get.defaultDialog(
       title: "Add Word",
-      content: Column(
-        children: [
-          TextField(
-            controller: wordController,
-            decoration: InputDecoration(
-              labelText: "Word",
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+        child: Column(
+          children: [
+            TextField(
+              controller: wordController,
+              decoration: InputDecoration(
+                labelText: "Word",
+              ),
+              autofocus: true,
             ),
-            autofocus: true,
-          ),
-          TextField(
-            controller: meaningController,
-            decoration: InputDecoration(
-              labelText: "Meaning",
+            TextField(
+              controller: meaningController,
+              decoration: InputDecoration(
+                labelText: "Meaning",
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(

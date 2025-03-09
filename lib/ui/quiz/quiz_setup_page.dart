@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meaning/resources/classes/app_data.dart';
+import 'package:meaning/resources/classes/word_class.dart';
+import 'package:meaning/resources/constants.dart';
 import 'package:meaning/ui/components/my_button.dart';
 import 'package:meaning/ui/quiz/quiz_page.dart';
+import 'package:squiggly_slider/slider.dart';
 
 class QuizSetupPage extends StatefulWidget {
   const QuizSetupPage({super.key});
@@ -12,7 +15,18 @@ class QuizSetupPage extends StatefulWidget {
 }
 
 class _QuizSetupPageState extends State<QuizSetupPage> {
+  AppData controller = Get.find<AppData>();
   bool isWordsExam = true;
+  bool isTodayWords = false;
+
+  List<Word> examWords = [];
+  late double numberOfQuestions;
+
+  @override
+  void initState() {
+    numberOfQuestions = controller.allWords.length > 4 ? (controller.allWords.length / 2 > 50 ? 50 : controller.allWords.length / 2) : 4;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,61 +36,135 @@ class _QuizSetupPageState extends State<QuizSetupPage> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 20),
-          Text(
-            "Choose the type of quiz",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
               children: [
-                Expanded(
-                  child: MyButton(
-                    backgroundColor: !isWordsExam ? Colors.deepPurple[800] : Colors.deepPurple[200],
-                    borderRadius: BorderRadius.circular(10),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    onPressed: () {
-                      setState(() => isWordsExam = false);
-                    },
-                    child: Text(
-                      'Meaning',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                Text(
+                  "Choose the type of quiz",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                Expanded(
-                  child: MyButton(
-                    backgroundColor: isWordsExam ? Colors.deepPurple[800] : Colors.deepPurple[200],
-                    borderRadius: BorderRadius.circular(10),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    margin: EdgeInsets.symmetric(horizontal: 5),
-                    onPressed: () {
-                      setState(() => isWordsExam = true);
-                    },
-                    child: Text(
-                      'Words',
-                      style: TextStyle(color: Colors.white),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        backgroundColor: !isWordsExam ? Colors.deepPurple[800] : Colors.deepPurple[200],
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        onPressed: () {
+                          setState(() => isWordsExam = false);
+                        },
+                        child: Text(
+                          'Meaning',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: MyButton(
+                        backgroundColor: isWordsExam ? Colors.deepPurple[800] : Colors.deepPurple[200],
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        onPressed: () {
+                          setState(() => isWordsExam = true);
+                        },
+                        child: Text(
+                          'Words',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Text(
+                  "Choose the number of questions",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                   ),
+                  textAlign: TextAlign.center,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SquigglySlider(
+                        min: 4,
+                        max: controller.allWords.length > 50 ? 50 : controller.allWords.length.toDouble(),
+                        squiggleAmplitude: 3.0,
+                        squiggleWavelength: 5.0,
+                        squiggleSpeed: .1,
+                        value: numberOfQuestions,
+                        onChanged: (double value) {
+                          setState(() => numberOfQuestions = value);
+                        },
+                        label: '$numberOfQuestions',
+                      ),
+                    ),
+                    Text(
+                      numberOfQuestions.toInt().toString(),
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Choose the words for the quiz',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: MyButton(
+                        backgroundColor: !isTodayWords ? Colors.deepPurple[800] : Colors.deepPurple[200],
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        onPressed: () => setState(() => isTodayWords = false),
+                        child: Text(
+                          'First ${numberOfQuestions.toInt()} Words',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: MyButton(
+                        backgroundColor: isTodayWords ? Colors.deepPurple[800] : Colors.deepPurple[200],
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        onPressed: () => setState(() => isTodayWords = true),
+                        child: Text(
+                          'Today Words',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Spacer(),
           MyButton(
             backgroundColor: Colors.pinkAccent,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             margin: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 20),
             borderRadius: BorderRadius.circular(10),
             onPressed: () {
-              AppData controller = Get.find<AppData>();
-              controller.getQuizReady(isWordsExam);
+              initializeExamWords();
+              if (examWords.length < 4) {
+                Get.snackbar('Error', 'You need at least 4 words TODAY to start the quiz');
+                return;
+              }
+              controller.getQuizReady(isWordsExam, examWords);
               Get.off(() => QuizPage());
             },
             child: Text('Start Quiz', style: TextStyle(fontSize: 18, color: Colors.white)),
@@ -85,5 +173,18 @@ class _QuizSetupPageState extends State<QuizSetupPage> {
         ],
       ),
     );
+  }
+
+  void initializeExamWords() {
+    examWords.clear();
+    if (isTodayWords) {
+      for (Word word in controller.allWords) {
+        if (isSameDay(DateTime.now(), word.timeAdded)) {
+          examWords.add(word);
+        }
+      }
+    } else {
+      examWords.addAll(controller.allWords.sublist(0, numberOfQuestions.toInt()));
+    }
   }
 }

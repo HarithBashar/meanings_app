@@ -31,17 +31,8 @@ class MyButton extends StatefulWidget {
 class _MyButtonState extends State<MyButton> {
   double _scale = 1.0;
 
-  void _onTapDown(TapDownDetails details) {
-    setState(() {
-      _scale = 0.9; // Shrinks when pressed
-    });
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() {
-      _scale = 1.0; // Returns to normal size
-    });
-  }
+  void _onTapDown(TapDownDetails details) => setState(() => _scale = 0.9);
+  void _onTapUp(TapUpDetails details) => setState(() => _scale = 1.0);
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +40,12 @@ class _MyButtonState extends State<MyButton> {
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: () => setState(() => _scale = 1.0),
-      // Reset if tap is canceled
       onTap: () => widget.onPressed(),
       child: AnimatedScale(
         scale: _scale,
         duration: Duration(milliseconds: 100),
-        child: Container(
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
           width: widget.width,
           padding: widget.padding,
           margin: widget.margin,
