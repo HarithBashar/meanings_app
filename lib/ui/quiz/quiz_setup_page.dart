@@ -18,6 +18,7 @@ class _QuizSetupPageState extends State<QuizSetupPage> {
   AppData controller = Get.find<AppData>();
   bool isWordsExam = true;
   bool isTodayWords = false;
+  bool isRandomChoice = true;
 
   List<Word> examWords = [];
   late double numberOfQuestions;
@@ -124,15 +125,27 @@ class _QuizSetupPageState extends State<QuizSetupPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: MyButton(
-                        backgroundColor: !isTodayWords ? Colors.deepPurple[800] : Colors.deepPurple[200],
-                        borderRadius: BorderRadius.circular(10),
-                        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        onPressed: () => setState(() => isTodayWords = false),
-                        child: Text(
-                          'First ${numberOfQuestions.toInt()} Words',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                      child: Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          MyButton(
+                            backgroundColor: !isTodayWords ? Colors.deepPurple[800] : Colors.deepPurple[200],
+                            borderRadius: BorderRadius.circular(10),
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            onPressed: () {
+                              if (!isTodayWords) isRandomChoice = !isRandomChoice;
+                              setState(() => isTodayWords = false);
+                            },
+                            child: Text(
+                              isRandomChoice ? 'Random Choice' : 'First ${numberOfQuestions.toInt()} Words',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15.0),
+                            child: Icon(Icons.refresh_rounded, color: Colors.white, size: 15),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -184,7 +197,9 @@ class _QuizSetupPageState extends State<QuizSetupPage> {
         }
       }
     } else {
+      if (isRandomChoice) controller.allWords.shuffle();
       examWords.addAll(controller.allWords.sublist(0, numberOfQuestions.toInt()));
+      controller.allWords.sort((a, b) => b.timeAdded.compareTo(a.timeAdded));
     }
   }
 }
